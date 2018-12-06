@@ -36,6 +36,31 @@ export function logaUsuario(dados) {
   }
 }
 
+export function cadastraUsuario(dados) {
+  return (dispatch) => {
+    const json = {
+      nome: dados.nome,
+      telefone: dados.telefone,
+      email: dados.email,
+      password: dados.senha
+    }
+    api
+      .post('/login', json)
+      .then(response => {
+        api.defaults.headers.common['x-access-token'] = response.data.token
+        dispatch({ type: 'LOGA_USUARIO', dados: response.data })
+        
+      })
+      .catch(error => {
+        console.error(error)
+        // if (error.response) {
+        //   alert(error.response.data.erro)
+        // }
+        alert('Erro ao cadastrar usuário')
+      })
+  }
+}
+
 export function deslogaUsuario() {
   return {
     type: 'DESLOGA_USUARIO'

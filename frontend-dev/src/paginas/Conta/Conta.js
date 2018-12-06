@@ -1,6 +1,10 @@
 import React, { Component } from 'react'
+import { connect } from 'react-redux'
+import { Redirect } from 'react-router-dom'
+import { cadastraUsuario } from '../../redux/actions'
+import Formulario from '../../componentes/Formulario/Formulario'
 import Link from '../../componentes/Link/Link'
-import Botao from '../../componentes/Botao/Botao'
+// import Botao from '../../componentes/Botao/Botao'
 import Legenda from '../../componentes/Legenda/Legenda'
 import Campo from '../../componentes/Campo/Campo'
 import './Conta.css'
@@ -24,6 +28,24 @@ class Conta extends Component {
     this.state = { desabilitado: true }
   }
 
+  enviaDados = (evento) => {
+    evento.preventDefault()
+
+    const campoNome = this.nomeRef.current
+    const campoTelefone = this.telefoneRef.current
+    const campoEmail = this.emailRef.current
+    const campoSenha = this.senhaRef.current
+
+    const dados = {
+      nome: campoNome.getValor(),
+      telefone: campoTelefone.getValor(),
+      email: campoEmail.getValor(),
+      senha: campoSenha.getValor()
+    }
+
+    this.props.cadastraUsuario(dados)
+  }
+
   habilitaOuDesabilita = () => {
     const campoNome = this.nomeRef.current
     const campoTelefone = this.telefoneRef.current
@@ -38,24 +60,31 @@ class Conta extends Component {
   }
 
   render() {
+    if (this.props.usuario) {
+      return <Redirect to="/" />
+    }
     return (
       <main className="conta">
         <h1>Conta</h1>
         <p>Envie o formulário para criar uma conta!</p>
         
-        <Legenda htmlFor="nome">Nome:</Legenda>
-        <Campo ref={this.nomeRef} id="nome" type="text" name="nome" placeholder="Nome" required minLength={10} onChange={this.habilitaOuDesabilita} />
+        <Formulario onSubmit={this.enviaDados}>
+          <Legenda htmlFor="nome">Nome:</Legenda>
+          <Campo ref={this.nomeRef} id="nome" type="text" name="nome" placeholder="Nome" required minLength={10} onChange={this.habilitaOuDesabilita} />
         
-        <Legenda htmlFor="telefone">Telefone:</Legenda>
-        <Campo ref={this.telefoneRef} id="telefone" type="tel" name="telefone" placeholder="Telefone" required onChange={this.habilitaOuDesabilita} />
+          <Legenda htmlFor="telefone">Telefone:</Legenda>
+          <Campo ref={this.telefoneRef} id="telefone" type="tel" name="telefone" placeholder="Telefone" required onChange={this.habilitaOuDesabilita} />
         
-        <Legenda htmlFor="email">Email:</Legenda>
-        <Campo ref={this.emailRef} id="email" type="email" name="email" placeholder="Email" required onChange={this.habilitaOuDesabilita} />
+          <Legenda htmlFor="email">Email:</Legenda>
+          <Campo ref={this.emailRef} id="email" type="email" name="email" placeholder="Email" required onChange={this.habilitaOuDesabilita} />
         
-        <Legenda htmlFor="senha">Senha:</Legenda>
-        <Campo ref={this.senhaRef} id="senha" type="password" name="senha" placeholder="Senha" required minLength={6} onChange={this.habilitaOuDesabilita} />
+          <Legenda htmlFor="senha">Senha:</Legenda>
+          <Campo ref={this.senhaRef} id="senha" type="password" name="senha" placeholder="Senha" required minLength={6} onChange={this.habilitaOuDesabilita} />
         
-        <Botao desabilitado={this.state.desabilitado}>Enviar</Botao>
+          <Formulario.Botao desabilitado={this.state.desabilitado}>
+            Enviar
+          </Formulario.Botao>
+        </Formulario>
   
         <Link url="/login">Fazer login</Link>
       </main>
@@ -63,4 +92,7 @@ class Conta extends Component {
   }
 }
 
-export default Conta
+export default connect(
+  (state) => ({usuario:state.usuario}),
+    {cadastraUsuario}
+  )(Conta)
